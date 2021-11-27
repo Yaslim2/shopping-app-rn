@@ -1,21 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { StyleSheet } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { NavigationContainer } from "@react-navigation/native";
+import { Provider } from "react-redux";
+import ProductsNavigator from "./navigation";
+import * as Font from "expo-font";
+import AppLoading from "expo-app-loading";
+import store from "./store";
 
-export default function App() {
+const fetchFonts = () => {
+  return Font.loadAsync({
+    "open-sans": require("./assets/fonts/OpenSans-Regular.ttf"),
+    "open-sans-bold": require("./assets/fonts/OpenSans-Bold.ttf"),
+  });
+};
+
+const App: React.FC = () => {
+  const [fontLoaded, setFontLoaded] = useState<boolean>(false);
+
+  if (!fontLoaded) {
+    return (
+      <AppLoading
+        startAsync={fetchFonts}
+        onFinish={() => setFontLoaded(true)}
+        onError={() => console.log("Error on loading the fonts")}
+      />
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+        <ProductsNavigator />
+        <StatusBar style="light" />
+      </NavigationContainer>
+    </Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
+
+const styles = StyleSheet.create({});
