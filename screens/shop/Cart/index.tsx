@@ -6,12 +6,13 @@ import { primaryColor, secondaryColor } from "../../../constants";
 import { Product } from "../../../models/Product";
 import { RootState } from "../../../store";
 import CartItem from "../../../components/CartItem";
+import moment from "moment";
 import {
   cartActions,
   CartItem as CartItemType,
 } from "../../../store/cartSlice";
 // import { Container } from './styles';
-import { orderActions } from "../../../store/orderSlice/index";
+import { sendData } from "../../../store/orderSlice/index";
 
 type RootStackParamList = {
   ProductsOverview: undefined;
@@ -27,7 +28,6 @@ const Cart = (
     (state: RootState) => state.cart.totalAmount
   );
   const { clearCart } = cartActions;
-  const { addOrder } = orderActions;
   const dispatch = useDispatch();
 
   const cartItems = useSelector((state: RootState) => {
@@ -38,7 +38,13 @@ const Cart = (
   });
 
   const handleOrder = () => {
-    dispatch(addOrder({ items: cartItems, totalAmount: cartTotalAmount }));
+    dispatch(
+      sendData({
+        items: cartItems,
+        totalAmount: cartTotalAmount,
+        date: moment().locale("pt-br").format("DD/MM/YYYY"),
+      })
+    );
     dispatch(clearCart());
   };
 

@@ -1,12 +1,19 @@
-import React from "react";
-import { Button, FlatList, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+  View,
+  Text,
+} from "react-native";
 import ProductItem from "../../../components/ProductItem";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { primaryColor } from "../../../constants";
-import { productActions } from "../../../store/productSlice";
-import { cartActions, CartItem } from "../../../store/cartSlice";
+import { asyncDelete, fetchData } from "../../../store/productSlice";
+import { cartActions } from "../../../store/cartSlice";
 import { Product } from "../../../models/Product/index";
 
 // import { Container } from './styles';
@@ -19,7 +26,8 @@ type RootStackParamList = {
 const UserProducts = (
   props: NativeStackScreenProps<RootStackParamList, "UserProducts">
 ) => {
-  const { deleteProduct } = productActions;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
   const { removeProduct } = cartActions;
   const dispatch = useDispatch();
   const userProducts = useSelector((state: RootState) => {
@@ -28,6 +36,21 @@ const UserProducts = (
       a.id > b.id ? 1 : -1
     );
   });
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        setError(false);
+        await dispatch(fetchData());
+        setIsLoading(false);
+      } catch (e) {
+        setError(true);
+        setIsLoading(false);
+      }
+    };
+    props.navigation.addListener("focus", loadData);
+  }, []);
 
   const handleSelect = (id: string) => {
     props.navigation.navigate("EditProducts", {
@@ -40,18 +63,45 @@ const UserProducts = (
       {
         text: "No",
         style: "default",
-        
       },
       {
         text: "Yes",
         style: "destructive",
         onPress: () => {
           dispatch(removeProduct({ id }));
-          dispatch(deleteProduct({ id }));
+          dispatch(asyncDelete(id));
         },
       },
     ]);
   };
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
+        <Text style={{ fontFamily: "open-sans-bold", fontSize: 20 }}>
+          Something went wrong...
+        </Text>
+      </View>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator color={primaryColor} size="large" />
+      </View>
+    );
+  }
+
+  if (!isLoading && userProducts.length === 0) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
+        <Text style={{ fontFamily: "open-sans-bold", fontSize: 20 }}>
+          No products around here.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList

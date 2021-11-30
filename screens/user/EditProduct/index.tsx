@@ -8,10 +8,12 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
+
 import { Product } from "../../../models/Product";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
-import { productActions } from "../../../store/productSlice";
+import { sendData } from "../../../store/productSlice";
+import { asyncUpdate } from "../../../store/productSlice";
 
 type RootStackParamList = {
   UserProducts: undefined;
@@ -22,8 +24,6 @@ type RootStackParamList = {
 const EditProduct = (
   props: NativeStackScreenProps<RootStackParamList, "EditProducts">
 ) => {
-  const { createProduct, updateProduct } = productActions;
-
   const initialTitle = props.route.params?.product?.title;
   const initialImage = props.route.params?.product?.imageUrl;
   const initialPrice = props.route.params?.product?.price.toString();
@@ -41,20 +41,19 @@ const EditProduct = (
 
   const dispatch = useDispatch();
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (props.route.params) {
       dispatch(
-        updateProduct({
-          id: props.route.params.product!.id,
+        asyncUpdate({
           description,
           title,
           imageUrl: image,
+          id: props.route.params.product!.id,
         })
       );
     } else {
       dispatch(
-        createProduct({
-          id: new Date().getTime().toString(),
+        sendData({
           ownerId: "u1",
           description,
           title,
@@ -87,7 +86,7 @@ const EditProduct = (
   }, [handleSave, navigation, route]);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
       <ScrollView>
         <View style={styles.form}>
           <View style={styles.formControl}>
