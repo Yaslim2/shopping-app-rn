@@ -6,7 +6,10 @@ import { primaryColor, secondaryColor } from "../../../constants";
 import { Product } from "../../../models/Product";
 import { RootState } from "../../../store";
 import CartItem from "../../../components/CartItem";
-import { CartItem as CartItemType } from "../../../store/cartSlice";
+import {
+  cartActions,
+  CartItem as CartItemType,
+} from "../../../store/cartSlice";
 // import { Container } from './styles';
 import { orderActions } from "../../../store/orderSlice/index";
 
@@ -23,6 +26,7 @@ const Cart = (
   const cartTotalAmount = useSelector(
     (state: RootState) => state.cart.totalAmount
   );
+  const { clearCart } = cartActions;
   const { addOrder } = orderActions;
   const dispatch = useDispatch();
 
@@ -35,14 +39,20 @@ const Cart = (
 
   const handleOrder = () => {
     dispatch(addOrder({ items: cartItems, totalAmount: cartTotalAmount }));
+    dispatch(clearCart());
   };
 
   return (
     <View style={styles.screen}>
       <View style={styles.summary}>
         <Text style={styles.summaryText}>
-          Total:
-          <Text style={styles.amount}> R$ {cartTotalAmount.toFixed(2)}</Text>
+          Total:{" "}
+          <Text style={styles.amount}>
+            R${" "}
+            {Math.round(
+              (Number(cartTotalAmount.toFixed(2)) * 100) / 100
+            ).toFixed(2)}
+          </Text>
         </Text>
         <Button
           disabled={cartItems.length === 0}
@@ -54,7 +64,7 @@ const Cart = (
 
       <FlatList
         data={cartItems}
-        renderItem={(itemData) => <CartItem item={itemData.item} />}
+        renderItem={(itemData) => <CartItem deletable item={itemData.item} />}
       />
     </View>
   );
@@ -84,6 +94,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     color: primaryColor,
+    marginLeft: 7,
   },
 });
 

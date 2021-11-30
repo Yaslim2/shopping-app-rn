@@ -14,6 +14,7 @@ import { CartItem as CartItemType } from "../../store/cartSlice";
 
 const CartItem: React.FC<{
   item: CartItemType;
+  deletable: boolean;
 }> = (props) => {
   const dispatch = useDispatch();
   const { removeFromCart } = cartActions;
@@ -29,9 +30,13 @@ const CartItem: React.FC<{
       </View>
       <View style={styles.itemDataPrice}>
         <Text style={styles.mainText}>R$ {props.item.sum.toFixed(2)}</Text>
-        <TouchableOpacity onPress={handleRemoveItem.bind(this, props.item.id)}>
-          <Ionicons name="ios-trash" size={23} color="red" />
-        </TouchableOpacity>
+        {props.deletable && (
+          <TouchableOpacity
+            onPress={handleRemoveItem.bind(this, props.item.id)}
+          >
+            <Ionicons name="ios-trash" size={23} color="red" />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

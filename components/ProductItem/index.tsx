@@ -12,14 +12,13 @@ import { Product } from "../../models/Product";
 
 const ProductItem: React.FC<{
   item: Product;
-  onAddCart: (id: string) => void;
-  onViewDetail: (id: string) => void;
+  onSelect: (id: string) => void;
 }> = (props) => {
   return (
     <View style={styles.product}>
       <View style={styles.touchable}>
         <TouchableNativeFeedback
-          onPress={props.onViewDetail.bind(this, props.item.id)}
+          onPress={props.onSelect?.bind(this, props.item.id)}
           useForeground
         >
           <View>
@@ -29,24 +28,11 @@ const ProductItem: React.FC<{
                 source={{ uri: props.item.imageUrl }}
               />
             </View>
-
             <View style={styles.details}>
               <Text style={styles.title}>{props.item.title}</Text>
               <Text style={styles.price}>R$ {props.item.price.toFixed(2)}</Text>
             </View>
-
-            <View style={styles.actions}>
-              <Button
-                color={primaryColor}
-                title="View details"
-                onPress={props.onViewDetail.bind(this, props.item.id)}
-              />
-              <Button
-                color={primaryColor}
-                title="Add to cart"
-                onPress={props.onAddCart.bind(this, props.item.id)}
-              />
-            </View>
+            <View style={styles.actions}>{props.children}</View>
           </View>
         </TouchableNativeFeedback>
       </View>

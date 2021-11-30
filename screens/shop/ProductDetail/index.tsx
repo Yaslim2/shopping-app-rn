@@ -36,14 +36,6 @@ const ProductDetail = (
   useEffect(() => {
     props.navigation.setOptions({
       headerTitle: product.title,
-      headerRight: () => (
-        <Ionicons
-          name="ios-cart"
-          size={24}
-          color="#fff"
-          onPress={() => props.navigation.navigate("Cart")}
-        />
-      ),
     });
   }, []);
 

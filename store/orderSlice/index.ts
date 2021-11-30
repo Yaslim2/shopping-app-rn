@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CartItem } from "../cartSlice/index";
+import moment from "moment";
 
-type OrderType = {
+export type OrderType = {
   id: string;
   items: CartItem[];
   totalAmount: number;
   date: string;
 };
+
 type OrderSliceState = {
   orders: OrderType[];
 };
@@ -25,12 +27,10 @@ const orderSlice = createSlice({
     ) => {
       state.orders.push({
         id: new Date().getTime().toString(),
-        date: new Date().toLocaleDateString("pt-BR"),
+        date: moment().locale("pt-br").format("DD/MM/YYYY"),
         items: action.payload.items,
         totalAmount: action.payload.totalAmount,
       });
-
-      console.log(state.orders);
     },
   },
 });
